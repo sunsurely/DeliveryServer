@@ -18,10 +18,6 @@ export class Menu {
   @IsNotEmpty()
   @IsNumber()
   readonly price: number;
-
-  @IsNotEmpty()
-  @IsString()
-  readonly imgUrl: string;
 }
 
 export class StoreDTO {
@@ -33,10 +29,6 @@ export class StoreDTO {
   @IsNotEmpty()
   @IsString()
   readonly address: string;
-
-  @IsNotEmpty()
-  @IsString()
-  readonly imgUrl: string;
 
   @IsNotEmpty()
   @IsString()
