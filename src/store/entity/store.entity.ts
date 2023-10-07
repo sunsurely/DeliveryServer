@@ -36,6 +36,9 @@ export class Store {
   @Column({ type: 'varchar' })
   call: string;
 
+  @Column({ type: 'int' })
+  categoryId: number;
+
   @CreateDateColumn()
   createdAt: Date;
 

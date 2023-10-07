@@ -1,13 +1,19 @@
-import { Injectable } from '@nestjs/common';
-
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Store } from './entity/store.entity';
 import { DataSource, Repository } from 'typeorm';
 import { Menu } from './entity/menu.entity';
-import { StoreDTO } from './dto/store.dto';
+import { MenuDTO, StoreDTO } from './dto/store.dto';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class StoreService {
-  constructor(private dataSource: DataSource) {}
+  constructor(
+    private dataSource: DataSource,
+    @InjectRepository(Store)
+    private storeRepository: Repository<Store>,
+    @InjectRepository(Menu)
+    private menuRepository: Repository<Menu>,
+  ) {}
 
   async registStore(
     storeDto: StoreDTO,
@@ -37,8 +43,9 @@ export class StoreService {
       newStore.name = storeDto.name;
       newStore.address = storeDto.address;
       newStore.imgUrl = images[0];
-      newStore.call = storeDto.category;
+      newStore.call = storeDto.call;
       newStore.userId = id;
+      newStore.categoryId = storeDto.categoryId;
 
       const savedStore = await queryRunner.manager.save(newStore);
 
@@ -55,11 +62,45 @@ export class StoreService {
       }
 
       await queryRunner.commitTransaction();
+      return;
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw error;
     } finally {
       await queryRunner.release();
     }
+  }
+
+  async getStoreByCategory(categoryId: number) {
+    let stores: Store[] = [];
+    if (categoryId === 0) {
+      stores = await this.storeRepository.find();
+
+      if (!stores || stores.length <= 0) {
+        throw new NotFoundException('등록된 가게가 없습니다.');
+      }
+    } else {
+      stores = await this.storeRepository.find({ where: { categoryId } });
+    }
+
+    return stores;
+  }
+
+  async registMenu(
+    storeId: number,
+    menuDto: MenuDTO,
+    file: Express.Multer.File,
+  ) {
+    const image = file ? file.filename : 'no image';
+
+    const newMenu = new Menu();
+    newMenu.imgUrl = image;
+    newMenu.description = menuDto.description;
+    newMenu.price = menuDto.price;
+    newMenu.menu = menuDto.menu;
+    newMenu.storeId = storeId;
+
+    await this.menuRepository.save(newMenu);
+    return;
   }
 }

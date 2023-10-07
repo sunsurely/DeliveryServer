@@ -6,7 +6,7 @@ import {
   MaxLength,
 } from 'class-validator';
 
-export class Menu {
+export class MenuDTO {
   @IsNotEmpty()
   @IsString()
   readonly menu: string;
@@ -35,10 +35,10 @@ export class StoreDTO {
   readonly call: string;
 
   @IsNotEmpty()
-  @IsString()
-  readonly category: string;
+  @IsNumber()
+  readonly categoryId: number;
 
   @IsNotEmpty()
   @IsArray()
-  readonly menus: Menu[];
+  readonly menus: MenuDTO[];
 }
