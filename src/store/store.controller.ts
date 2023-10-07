@@ -33,15 +33,26 @@ export class StoreController {
     return '상점등록 성공';
   }
 
-  @Get('/:categoryId')
-  async getStoreByCategory(
+  @Get('/category/:categoryId')
+  async getStoresByCategory(
     @Param(
       'categoryId',
       new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
     )
     categoryId: number,
   ) {
-    return await this.storeService.getStoreByCategory(categoryId);
+    return await this.storeService.getStoresByCategory(categoryId);
+  }
+
+  @Get('/:storeId')
+  async getStoreByStoreId(
+    @Param(
+      'storeId',
+      new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
+    )
+    storeId: number,
+  ) {
+    return await this.storeService.getStoreByStoreId(storeId);
   }
 
   @UseGuards(AuthGuard('jwt'))
@@ -58,5 +69,16 @@ export class StoreController {
   ) {
     await this.storeService.registMenu(storeId, menuDto, file);
     return '메뉴등록 성공';
+  }
+
+  @Get('/menu/:menuId')
+  async getMenu(
+    @Param(
+      'menuId',
+      new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
+    )
+    menuId: number,
+  ) {
+    return await this.storeService.getMenu(menuId);
   }
 }

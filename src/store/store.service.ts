@@ -71,7 +71,7 @@ export class StoreService {
     }
   }
 
-  async getStoreByCategory(categoryId: number) {
+  async getStoresByCategory(categoryId: number): Promise<Store[]> {
     let stores: Store[] = [];
     if (categoryId === 0) {
       stores = await this.storeRepository.find();
@@ -84,6 +84,24 @@ export class StoreService {
     }
 
     return stores;
+  }
+
+  async getStoreByStoreId(storeId: number) {
+    const store = await this.storeRepository.findOne({
+      where: { id: storeId },
+    });
+
+    if (!store) {
+      throw new NotFoundException('가게조회 실패');
+    }
+
+    const menus = await this.menuRepository.find({ where: { storeId } });
+
+    if (!menus || menus.length <= 0) {
+      throw new NotFoundException('메뉴조회 실패');
+    }
+
+    return { store, menus };
   }
 
   async registMenu(
@@ -102,5 +120,25 @@ export class StoreService {
 
     await this.menuRepository.save(newMenu);
     return;
+  }
+
+  async getMenusByCategory(storeId: number) {
+    const menus = await this.menuRepository.find({ where: { storeId } });
+
+    if (!menus || menus.length <= 0) {
+      throw new NotFoundException('등록된 메뉴가 없습니다.');
+    }
+
+    return menus;
+  }
+
+  async getMenu(menuId: number) {
+    const menu = await this.menuRepository.findOne({ where: { id: menuId } });
+
+    if (!menu) {
+      throw new NotFoundException('등록된 메뉴가 없습니다.');
+    }
+
+    return menu;
   }
 }
